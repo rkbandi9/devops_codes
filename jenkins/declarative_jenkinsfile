@@ -1,0 +1,31 @@
+pipeline {
+    agent { label 'node1_jdk' }
+    stages { 
+
+        stage('version control system') {
+            steps {
+                git url: 'https://github.com/rkbandi9/game-of-life.git',
+                branch: 'master'
+            }   
+        }
+
+         stage('Build') {
+             steps {
+                sh 'export PATH="/usr/lib/jvm/java-1.8.0-openjdk-amd64/bin:$PATH" && mvn package'
+             }
+         }
+
+         stage('archive the artifact') {
+             steps {
+              archiveArtifacts artifacts: '**/target/*.war'
+            }
+         }
+
+         stage('show test result') {
+             steps {
+               junit testResults: '**/surefire-reports/TEST-*.xml'
+            }
+         }     
+    }
+   
+}
